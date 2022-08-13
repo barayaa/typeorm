@@ -1,33 +1,45 @@
-import { BaseEntity, Column, CreateDateColumn, Entity, PrimaryColumn, UpdateDateColumn } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, Entity, ManyToMany, OneToMany, PrimaryColumn, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Transaction } from "./transaction";
+import { Person } from "./utils/person";
+import { Banker } from './banker';
 
 
 @Entity('clients')
-export class Client extends BaseEntity{
+export class Client extends Person {
 
-    @PrimaryColumn()
-    id: number
-
-    @Column()
-    first_name: string
-
-    @Column()
-    last_name: string
+   
+    @Column({
+        default: true,
+        name: "active"
+    })
+    is_active: boolean
 
     @Column({
-        unique: true,
+        type: "simple-json",
+        nullable: true,
     })
-    email: string
+    additional_info:{
+        age: number
+        hair_color: string
+    }
+
+    @OneToMany(
+        () => Transaction,
+        transaction => transaction.client
+    )
+    transactions: Transaction[]
+
+
+    @ManyToMany(
+        ()=> Banker
+    )
+    bankers: Banker[]
 
     @Column({
-        unique: true,
-        length: 10
+        type: "simple-array",
+        default: []
     })
-    card_number: string
-
-    @Column({
-        type: 'numeric',
-    })
-    balance: number
+    family_member: string
 
     @CreateDateColumn()
     created_at: string
